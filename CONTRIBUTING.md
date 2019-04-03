@@ -20,12 +20,12 @@ subject to a Simplified BSD License) in Contributions.
 ## Other Resources
 
 Discussion of this work occurs on the
-[jhoyla working group mailing list](https://mailarchive.ietf.org/arch/browse/jhoyla/)
-([subscribe](https://www.ietf.org/mailman/listinfo/jhoyla)).  In addition to
-contributions on GitHub, you are encouraged to participate in discussions there.
+[importer working group mailing list](https://mailarchive.ietf.org/arch/browse/importer/)
+([subscribe](https://www.ietf.org/mailman/listinfo/importer)).  In addition to
+contributions in GitHub, you are encouraged to participate in discussions there.
 
 **Note**: Some working groups adopt a policy whereby substantive discussion of
 technical issues needs to occur on the mailing list.
 
 You might also like to familiarize yourself with other
-[working group documents](https://datatracker.ietf.org/wg/jhoyla/documents/).
+[working group documents](https://datatracker.ietf.org/wg/importer/documents/).
