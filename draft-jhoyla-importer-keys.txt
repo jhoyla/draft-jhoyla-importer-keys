@@ -74,14 +74,14 @@ Table of Contents
    TLS 1.3 defines an exporter keys interface to allow other protocols
    to build on top of it.  The exporter keys interface provides channel
    bindings that other protocols can agree on, allowing them to build
-   off the security of TLS.
-   TLS 1.3, however, does not provide an equivalent interface for
-   importing keys, which makes it difficult to build off the security of
-   other protocols to strengthen TLS.  The most similar interface is the
-   out-of-band pre-shared key interface, however it is possible to use
-   this interface insecurely.  This drafts describes a change to the use
-   of the OOB PSK interface to make it easier to use secondary protocols
-   to improve the security guarantees of TLS.
+   off the security of TLS.  TLS 1.3, however, does not provide an
+   equivalent interface for importing keys, which makes it difficult to
+   build off the security of other protocols to strengthen TLS.  The
+   most similar interface is the out-of-band pre-shared key interface,
+   however it is possible to use this interface insecurely.  This drafts
+   describes a change to the use of the OOB PSK interface to make it
+   easier to use secondary protocols to improve the security guarantees
+   of TLS.
 
    Various drafts have been proposed that extend the TLS handshake to
    provide various different extra guarantees.  The purpose of this
@@ -92,9 +92,8 @@ Table of Contents
    a pair (PSK_ID, PSK) are included in the TLS handshake.  We can
    consider OOB keys as having been established through some protocol,
    whether this is a different handshake protocol, a phone call, or
-   manual configuration.
-   Together this OOB protocol and the TLS handshake can be considered a
-   compound authentication protocol.
+   manual configuration.  Together this OOB protocol and the TLS
+   handshake can be considered a compound authentication protocol.
 
 1.1.  Compound Authentication
 
@@ -106,6 +105,7 @@ Table of Contents
    to achieve some stronger authentication guarantee, specifically
    compound authentication.  Compound authentication is the property
    that, given a run of a compound authentication protocol, if any layer
+   of the protocol's authentication was succesful then all layers are
 
 
 
@@ -114,15 +114,14 @@ Hoyland & Wood           Expires October 5, 2019                [Page 2]
 Internet-Draft           The Importer keys draft              April 2019
 
 
-   of the protocol's authentication was succesful then all layers are
    authentic.  For a compound authentication protocol to be secure, i.e.
    to provide compound authentication, both parties must agree on a
    channel binding for each layer, and further they must agree on the
    complete list of channel bindings.  This assumes the Bhargavan /
-   Delignat-Lavaut hypothesis.
-   This property can be used to guarantee that the injected key material
-   is authentic, and further, in the case that there exists a flaw in
-   TLS, to ensure the authenticity of TLS session, despite the flaws.
+   Delignat-Lavaut hypothesis.  This property can be used to guarantee
+   that the injected key material is authentic, and further, in the case
+   that there exists a flaw in TLS, to ensure the authenticity of TLS
+   session, despite the flaws.
 
 Authors' Addresses
 
@@ -136,6 +135,7 @@ Authors' Addresses
    Apple Inc.
 
    Email: cawood@apple.com
+
 
 
 
