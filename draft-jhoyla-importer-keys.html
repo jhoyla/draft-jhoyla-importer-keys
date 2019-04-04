@@ -282,18 +282,27 @@ ul.toc li {
 
   <link href="#rfc.toc" rel="Contents">
 <link href="#rfc.section.1" rel="Chapter" title="1 Introduction">
-<link href="#rfc.section.1.1" rel="Chapter" title="1.1 Compound Authentication">
+<link href="#rfc.section.1.1" rel="Chapter" title="1.1 Channel Bindings">
+<link href="#rfc.section.1.2" rel="Chapter" title="1.2 Compound Authentication">
+<link href="#rfc.section.1.3" rel="Chapter" title="1.3 Contributive Channel Bindings">
+<link href="#rfc.section.2" rel="Chapter" title="2 OOB PSKs">
+<link href="#rfc.section.3" rel="Chapter" title="3 Examples">
+<link href="#rfc.section.4" rel="Chapter" title="4 Other changes">
+<link href="#rfc.section.5" rel="Chapter" title="5 Security Considerations">
+<link href="#rfc.section.5.1" rel="Chapter" title="5.1 Seperation of protocols from the TLS handshake">
+<link href="#rfc.section.5.2" rel="Chapter" title="5.2 Compound Authentication">
+<link href="#rfc.section.6" rel="Chapter" title="6 IANA Considerations">
 <link href="#rfc.authors" rel="Chapter">
 
 
-  <meta name="generator" content="xml2rfc version 2.9.6 - https://tools.ietf.org/tools/xml2rfc" />
+  <meta name="generator" content="xml2rfc version 2.22.2 - https://tools.ietf.org/tools/xml2rfc" />
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
   <meta name="dct.creator" content="Hoyland, J., Ed. and C. Wood, Ed." />
   <meta name="dct.identifier" content="urn:ietf:id:draft-jhoyla-importer-keys-latest" />
   <meta name="dct.issued" scheme="ISO8601" content="2019-04" />
-  <meta name="dct.abstract" content="Numerous protocol drafts have been proposed that inject key material into the TLS 1.3 handshake.  For this to not introduce vulnerabilities this needs to be done with agreement by both sides on the context around the key material.  In particular they need to agree on various parameters, such as the method used to produce the extra key material, the role played by each actor, and the key material itself.  This draft describes how to inject key material whilst ensuring agreement on all the relevant context." />
-  <meta name="description" content="Numerous protocol drafts have been proposed that inject key material into the TLS 1.3 handshake.  For this to not introduce vulnerabilities this needs to be done with agreement by both sides on the context around the key material.  In particular they need to agree on various parameters, such as the method used to produce the extra key material, the role played by each actor, and the key material itself.  This draft describes how to inject key material whilst ensuring agreement on all the relevant context." />
+  <meta name="dct.abstract" content="Numerous protocol drafts have been proposed that modify the TLS 1.3 handshake by injecting key material into the key schedule.  For this to not introduce vulnerabilities this needs to be done with care.  There needs to be agreement by both sides on the context around the key material, and there needs to be assurance that the modifications don&#8217;t reduce the security of the handshake.  This draft describes how to inject key material safely whilst ensuring agreement on all the relevant context." />
+  <meta name="description" content="Numerous protocol drafts have been proposed that modify the TLS 1.3 handshake by injecting key material into the key schedule.  For this to not introduce vulnerabilities this needs to be done with care.  There needs to be agreement by both sides on the context around the key material, and there needs to be assurance that the modifications don&#8217;t reduce the security of the handshake.  This draft describes how to inject key material safely whilst ensuring agreement on all the relevant context." />
 
 </head>
 
@@ -331,7 +340,7 @@ ul.toc li {
   <span class="filename">draft-jhoyla-importer-keys-latest</span></p>
   
   <h1 id="rfc.abstract"><a href="#rfc.abstract">Abstract</a></h1>
-<p>Numerous protocol drafts have been proposed that inject key material into the TLS 1.3 handshake.  For this to not introduce vulnerabilities this needs to be done with agreement by both sides on the context around the key material.  In particular they need to agree on various parameters, such as the method used to produce the extra key material, the role played by each actor, and the key material itself.  This draft describes how to inject key material whilst ensuring agreement on all the relevant context.</p>
+<p>Numerous protocol drafts have been proposed that modify the TLS 1.3 handshake by injecting key material into the key schedule.  For this to not introduce vulnerabilities this needs to be done with care.  There needs to be agreement by both sides on the context around the key material, and there needs to be assurance that the modifications don&#8217;t reduce the security of the handshake.  This draft describes how to inject key material safely whilst ensuring agreement on all the relevant context.</p>
 <h1 id="rfc.status"><a href="#rfc.status">Status of This Memo</a></h1>
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
@@ -348,9 +357,27 @@ ul.toc li {
 
   	<li>1.   <a href="#rfc.section.1">Introduction</a>
 </li>
-<ul><li>1.1.   <a href="#rfc.section.1.1">Compound Authentication</a>
+<ul><li>1.1.   <a href="#rfc.section.1.1">Channel Bindings</a>
 </li>
-</ul><li><a href="#rfc.authors">Authors' Addresses</a>
+<li>1.2.   <a href="#rfc.section.1.2">Compound Authentication</a>
+</li>
+<li>1.3.   <a href="#rfc.section.1.3">Contributive Channel Bindings</a>
+</li>
+</ul><li>2.   <a href="#rfc.section.2">OOB PSKs</a>
+</li>
+<li>3.   <a href="#rfc.section.3">Examples</a>
+</li>
+<li>4.   <a href="#rfc.section.4">Other changes</a>
+</li>
+<li>5.   <a href="#rfc.section.5">Security Considerations</a>
+</li>
+<ul><li>5.1.   <a href="#rfc.section.5.1">Seperation of protocols from the TLS handshake</a>
+</li>
+<li>5.2.   <a href="#rfc.section.5.2">Compound Authentication</a>
+</li>
+</ul><li>6.   <a href="#rfc.section.6">IANA Considerations</a>
+</li>
+<li><a href="#rfc.authors">Authors' Addresses</a>
 </li>
 
 
@@ -359,13 +386,55 @@ ul.toc li {
   <h1 id="rfc.section.1">
 <a href="#rfc.section.1">1.</a> <a href="#introduction" id="introduction">Introduction</a>
 </h1>
-<p id="rfc.section.1.p.1">TLS 1.3 defines an exporter keys interface to allow other protocols to build on top of it.  The exporter keys interface provides channel bindings that other protocols can agree on, allowing them to build off the security of TLS.  TLS 1.3, however, does not provide an equivalent interface for importing keys, which makes it difficult to build off the security of other protocols to strengthen TLS.  The most similar interface is the out-of-band pre-shared key interface, however it is possible to use this interface insecurely.  This drafts describes a change to the use of the OOB PSK interface to make it easier to use secondary protocols to improve the security guarantees of TLS.</p>
-<p id="rfc.section.1.p.2">Various drafts have been proposed that extend the TLS handshake to provide various different extra guarantees.  The purpose of this draft is to provide a structured way of doing so, using the OOB PSK interface, with clear guarantees.</p>
-<p id="rfc.section.1.p.3">When using TLS&#8217;s out-of-band pre-shared key (OOB PSK) interface keys a pair (PSK_ID, PSK) are included in the TLS handshake.  We can consider OOB keys as having been established through some protocol, whether this is a different handshake protocol, a phone call, or manual configuration.  Together this OOB protocol and the TLS handshake can be considered a compound authentication protocol.</p>
+<p id="rfc.section.1.p.1">Numerous protocol drafts have been proposed that modify the security guarantees of TLS 1.3 in various ways.  However modifying the protocol, especially modifying the key schedule could invalidate the formal analyses that have been performed on it.  This makes it difficult to work out the security properties of the modified protocol.</p>
+<p id="rfc.section.1.p.2">TLS 1.3 currently provides a fixed interface for producing channel bindings, allowing other protocols to be run over the top of TLS, and to benefit from its security guarantees, producing a stronger combined protocol.  This type of modification is well understood, and can be shown to not weaken the guarantees of the underlying TLS session.  TLS however does not currently provide a simple way of running TLS over the top of other protocols and allowing TLS to benefit from their guarantees.  The closest mechanism to this is the out-of-band (OOB) pre-shared key (PSK) mechanism.  The OOB PSK mechanism takes a pair of (PSK_ID, PSK), and uses them to establish a TLS connection.  However this mechanism does not use certificates, relying on the OOB PSK to provide implicit authentication.  A recently published paper on TLS 1.3 points out a way the OOB PSK mechanism can be abused.  If more than two agents have access to the OOB PSK then the lack of explicit authentication in the TLS handshake can be used to confuse the agents about who is on the other end of the connection.</p>
+<p id="rfc.section.1.p.3">In this draft we propose a modification to the OOB PSK mechanism to mitigate this issue, and further to provide a uniform interface similar to the exporter keys interface for layering TLS on top of other protocols.  By relying on the literature on channel bindings, we offer a mechanism with explicit security goals.  Protocol drafts that use this mechanism will thus find it easier to articulate what the security goals they want to achieve are.</p>
+<p id="rfc.section.1.p.4">A further benefit of producing a uniform mechanism for binding TLS sessions to other protocols is that it becomes possible to reason formally about whether any binding can reduce the security of a TLS session.  We base this design off the work of Bhargavan et al.</p>
 <h1 id="rfc.section.1.1">
-<a href="#rfc.section.1.1">1.1.</a> <a href="#compound-authentication" id="compound-authentication">Compound Authentication</a>
+<a href="#rfc.section.1.1">1.1.</a> <a href="#channel-bindings" id="channel-bindings">Channel Bindings</a>
 </h1>
-<p id="rfc.section.1.1.p.1">A compound protocol is simply a number of protocols run in sequence, with some of the outputs of each protocol being inputs into the next, that are intended to give different guarantees than running the protocols individually.  A compound authentication protocol is simply a compound protocol with multiple authentication layers, that intends to achieve some stronger authentication guarantee, specifically compound authentication.  Compound authentication is the property that, given a run of a compound authentication protocol, if any layer of the protocol&#8217;s authentication was succesful then all layers are authentic.  For a compound authentication protocol to be secure, i.e. to provide compound authentication, both parties must agree on a channel binding for each layer, and further they must agree on the complete list of channel bindings.  This assumes the Bhargavan / Delignat-Lavaut hypothesis.  This property can be used to guarantee that the injected key material is authentic, and further, in the case that there exists a flaw in TLS, to ensure the authenticity of TLS session, despite the flaws.</p>
+<p id="rfc.section.1.1.p.1">The exporter keys interface provides channel bindings that other protocols can agree on, allowing them to build off the security of TLS.  We define a channel binding as a public value that uniquely identifies a run, such that if all parties involved in a protocol run agree on a channel binding they agree on all the parameters of that run.  By agreeing on the channel binding of one protocol in another, it is possible to reason about the security of each protocol in terms of the other.  Thus by agreeing on the exporter key of a TLS session in a run of a different protocol (and proving possession of the relevant secrets) an actor can leverage the authentication guarantees of TLS in the latter protocol.</p>
+<p id="rfc.section.1.1.p.2">TLS 1.3, however, does not provide an equivalent interface for importing keys, which makes it difficult to build off the security of other protocols to strengthen TLS.  The most similar interface is the out-of-band pre-shared key interface, however it is possible to use this interface insecurely.  This drafts describes a change to the use of the OOB PSK interface to make it easier to use secondary protocols to improve the security guarantees of TLS.</p>
+<p id="rfc.section.1.1.p.3">Various drafts have been proposed that extend the TLS handshake to provide various different extra guarantees.  The purpose of this draft is to provide a structured way of doing so, using the OOB PSK interface, with clear security goals.</p>
+<p id="rfc.section.1.1.p.4">When using TLS&#8217;s out-of-band pre-shared key (OOB PSK) interface keys a pair (PSK_ID, PSK) are included in the TLS handshake.  We can consider OOB keys as having been established through some protocol, whether this is a different handshake protocol, a phone call, or manual configuration.  Together this OOB protocol and the TLS handshake can be considered a compound authentication protocol.</p>
+<h1 id="rfc.section.1.2">
+<a href="#rfc.section.1.2">1.2.</a> <a href="#compound-authentication" id="compound-authentication">Compound Authentication</a>
+</h1>
+<p id="rfc.section.1.2.p.1">A compound protocol is simply a number of protocols run in sequence, with some of the outputs of each protocol being inputs into the next, that are intended to give different guarantees than running the protocols individually.  A compound authentication protocol is simply a compound protocol with multiple authentication layers, that intends to achieve some stronger authentication guarantee, specifically compound authentication.  Compound authentication is the property that, given a run of a compound authentication protocol, if any layer of the protocol&#8217;s authentication was succesful then all layers are authentic.  For a compound authentication protocol to be secure, i.e. to provide compound authentication, both parties must agree on a channel binding for each layer, and further they must agree on the complete list of channel bindings.  This assumes the Bhargavan hypothesis.  This property can be used to guarantee that the injected key material is authentic, and further, in the case that there exists a flaw in TLS, to ensure the authenticity of TLS session, despite the flaws.</p>
+<h1 id="rfc.section.1.3">
+<a href="#rfc.section.1.3">1.3.</a> <a href="#contributive-channel-bindings" id="contributive-channel-bindings">Contributive Channel Bindings</a>
+</h1>
+<p id="rfc.section.1.3.p.1">The Bhargavan hypothesis states that if every layer of a compound protocol agrees on what it calls contributive channel bindings, then they achieve compound authentication.  For channel bindings to be contributive they need to commit to various pieces of information.  Namely: [[insert list]]</p>
+<p id="rfc.section.1.3.p.2">This gives us a strong starting point for redesigning the OOB PSK interface.</p>
+<h1 id="rfc.section.2">
+<a href="#rfc.section.2">2.</a> <a href="#oob-psks" id="oob-psks">OOB PSKs</a>
+</h1>
+<p id="rfc.section.2.p.1">The heart of our modification is to require the PSK_ID to be a contributive channel binding.  We thus provide an interface with the requisite fields as follows.</p>
+<p id="rfc.section.2.p.2">[[Function]]</p>
+<p id="rfc.section.2.p.3">We also modify the key to bind the key and the channel binding.  [[Function]]</p>
+<h1 id="rfc.section.3">
+<a href="#rfc.section.3">3.</a> <a href="#examples" id="examples">Examples</a>
+</h1>
+<p id="rfc.section.3.p.1">[[ToDo: Show how to apply the modified OOB PSK to all relevant drafts]]</p>
+<h1 id="rfc.section.4">
+<a href="#rfc.section.4">4.</a> <a href="#other-changes" id="other-changes">Other changes</a>
+</h1>
+<p id="rfc.section.4.p.1">[[ToDo: Consider optionally including the certificate in OOB PSK handshakes to achieve stronger auth guarantees in terms of compound auth]]</p>
+<h1 id="rfc.section.5">
+<a href="#rfc.section.5">5.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a>
+</h1>
+<h1 id="rfc.section.5.1">
+<a href="#rfc.section.5.1">5.1.</a> <a href="#seperation-of-protocols-from-the-tls-handshake" id="seperation-of-protocols-from-the-tls-handshake">Seperation of protocols from the TLS handshake</a>
+</h1>
+<p id="rfc.section.5.1.p.1">By using an HKDF on both the PSK and PSK_ID we isolate the TLS handshake from the prior protocols, reducing the possibility of the modifications weakening the TLS handshake.</p>
+<h1 id="rfc.section.5.2">
+<a href="#rfc.section.5.2">5.2.</a> <a href="#compound-authentication-1" id="compound-authentication-1">Compound Authentication</a>
+</h1>
+<p id="rfc.section.5.2.p.1">[[How does the lack of explicit auth in the OOB PSK handshake affect compound auth properties]]</p>
+<h1 id="rfc.section.6">
+<a href="#rfc.section.6">6.</a> <a href="#iana-considerations" id="iana-considerations">IANA Considerations</a>
+</h1>
+<p id="rfc.section.6.p.1">[[Protocol labels need to be globally unique. IANA registry?]]</p>
 <h1 id="rfc.authors"><a href="#rfc.authors">Authors' Addresses</a></h1>
 <div class="avoidbreak">
   <address class="vcard">
