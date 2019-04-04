@@ -81,19 +81,37 @@ This property can be used to guarantee that the injected key material is authent
 
 ##Contributive Channel Bindings
 The Bhargavan hypothesis states that if every layer of a compound protocol agrees on what it calls contributive channel bindings, then they achieve compound authentication.
-For channel bindings to be contributive they need to commit to various pieces of information.
-Namely: \[\[insert list\]\]
+For channel bindings to be contributive they need to commit to various pieces of information, commiting to a special "⊥" value if they don't exist.
+Namely:
+
+1. c_i : The initiators (public) credential
+2. c_r : The responders (public) credential
+3. sid : A global session identifier
+4. cb : A channel binding for the current instance\*
+5. cb_in : A channel binding for the previous protocol layer (if any)\*\*
+6. secrets : Any session specific secrets established in the protocol run
+
+\* This simply means that a contributive channel binding must also meet the definition of a regular channel binding, i.e. it must commit to enough parameters of the protocol that it is computationally infeasible to find two protocol runs with different parameters that produce the same channel binding.
+
+\*\* This requires a chain of protocols to have a strict ordering, so even if someone wishes to inject multiple different pieces of key material into the OOB PSK interface it remains non-ambiguous.
 
 This gives us a strong starting point for redesigning the OOB PSK interface.
 
 #OOB PSKs
 The heart of our modification is to require the PSK_ID to be a contributive channel binding.
 We thus provide an interface with the requisite fields as follows.
+For a given raw (PSK_ID, PSK) pair the constructed (PSK_ID, PSK) pair should be constructed as follows:
 
-\[\[Function\]\]
+    PSK_ID = HKDF-Expand(raw_PSK, c_i, c_r, sid, cb, cb_in, secrets, raw_PSK_ID)
 
+\[\[This is a bit weird, because if c_i and c_r are both set to ⊥ then the Selfie attack is actually the expected behaviour\]\]
+
+\[\[cb needs to include a globally unique protocol label for every different draft. Some kind of IANA registry maybe?\]\]
 We also modify the key to bind the key and the channel binding.
-\[\[Function\]\]
+
+     PSK = HKDF-Expand(raw_PSK, PSK_ID)
+
+\[\[Does this make sense/achieve anything?\]\]
 
 #Examples
 \[\[ToDo: Show how to apply the modified OOB PSK to all relevant drafts\]\]
