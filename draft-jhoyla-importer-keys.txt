@@ -69,14 +69,14 @@ Table of Contents
      1.1.  Channel Bindings  . . . . . . . . . . . . . . . . . . . .   3
      1.2.  Compound Authentication . . . . . . . . . . . . . . . . .   4
      1.3.  Contributive Channel Bindings . . . . . . . . . . . . . .   4
-   2.  OOB PSKs  . . . . . . . . . . . . . . . . . . . . . . . . . .   4
-   3.  Examples  . . . . . . . . . . . . . . . . . . . . . . . . . .   4
+   2.  OOB PSKs  . . . . . . . . . . . . . . . . . . . . . . . . . .   5
+   3.  Examples  . . . . . . . . . . . . . . . . . . . . . . . . . .   5
    4.  Other changes . . . . . . . . . . . . . . . . . . . . . . . .   5
    5.  Security Considerations . . . . . . . . . . . . . . . . . . .   5
      5.1.  Seperation of protocols from the TLS handshake  . . . . .   5
-     5.2.  Compound Authentication . . . . . . . . . . . . . . . . .   5
-   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   5
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   5
+     5.2.  Compound Authentication . . . . . . . . . . . . . . . . .   6
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   6
 
 1.  Introduction
 
@@ -195,28 +195,28 @@ Internet-Draft           The Importer keys draft              April 2019
    The Bhargavan hypothesis states that if every layer of a compound
    protocol agrees on what it calls contributive channel bindings, then
    they achieve compound authentication.  For channel bindings to be
-   contributive they need to commit to various pieces of information.
-   Namely: [[insert list]]
+   contributive they need to commit to various pieces of information,
+   commiting to a special "&#8869;" value if they don't exist.  Namely:
 
-   This gives us a strong starting point for redesigning the OOB PSK
-   interface.
+   1.  c_i : The initiators (public) credential
 
-2.  OOB PSKs
+   2.  c_r : The responders (public) credential
 
-   The heart of our modification is to require the PSK_ID to be a
-   contributive channel binding.  We thus provide an interface with the
-   requisite fields as follows.
+   3.  sid : A global session identifier
 
-   [[Function]]
+   4.  cb : A channel binding for the current instance*
 
-   We also modify the key to bind the key and the channel binding.
-   [[Function]]
+   5.  cb_in : A channel binding for the previous protocol layer (if
+       any)**
 
-3.  Examples
+   6.  secrets : Any session specific secrets established in the
+       protocol run
 
-   [[ToDo: Show how to apply the modified OOB PSK to all relevant
-   drafts]]
-
+   * This simply means that a contributive channel binding must also
+   meet the definition of a regular channel binding, i.e. it must commit
+   to enough parameters of the protocol that it is computationally
+   infeasible to find two protocol runs with different parameters that
+   produce the same channel binding.
 
 
 
@@ -225,6 +225,38 @@ Hoyland & Wood           Expires October 6, 2019                [Page 4]
 
 Internet-Draft           The Importer keys draft              April 2019
 
+
+   ** This requires a chain of protocols to have a strict ordering, so
+   even if someone wishes to inject multiple different pieces of key
+   material into the OOB PSK interface it remains non-ambiguous.
+
+   This gives us a strong starting point for redesigning the OOB PSK
+   interface.
+
+2.  OOB PSKs
+
+   The heart of our modification is to require the PSK_ID to be a
+   contributive channel binding.  We thus provide an interface with the
+   requisite fields as follows.  For a given raw (PSK_ID, PSK) pair the
+   constructed (PSK_ID, PSK) pair should be constructed as follows:
+
+PSK_ID = HKDF-Expand(raw_PSK, c_i, c_r, sid, cb, cb_in, secrets, raw_PSK_ID)
+
+   [[This is a bit weird, because if c_i and c_r are both set to &#8869;
+   then the Selfie attack is actually the expected behaviour]]
+
+   [[cb needs to include a globally unique protocol label for every
+   different draft.  Some kind of IANA registry maybe?]] We also modify
+   the key to bind the key and the channel binding.
+
+    PSK = HKDF-Expand(raw_PSK, PSK_ID)
+
+   [[Does this make sense/achieve anything?]]
+
+3.  Examples
+
+   [[ToDo: Show how to apply the modified OOB PSK to all relevant
+   drafts]]
 
 4.  Other changes
 
@@ -239,6 +271,16 @@ Internet-Draft           The Importer keys draft              April 2019
    By using an HKDF on both the PSK and PSK_ID we isolate the TLS
    handshake from the prior protocols, reducing the possibility of the
    modifications weakening the TLS handshake.
+
+
+
+
+
+
+Hoyland & Wood           Expires October 6, 2019                [Page 5]
+
+Internet-Draft           The Importer keys draft              April 2019
+
 
 5.2.  Compound Authentication
 
@@ -277,4 +319,18 @@ Authors' Addresses
 
 
 
-Hoyland & Wood           Expires October 6, 2019                [Page 5]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hoyland & Wood           Expires October 6, 2019                [Page 6]
